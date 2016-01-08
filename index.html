@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Web Worker Test</title>
+</head>
+<body>
+
+<button onclick="startWorker()">Start worker</button>
+<button onclick="stopWorker()">Stop worker</button>
+<button onclick="postMessageToWorker()">Post message</button>
+<button onclick="toggleTimerInWorker()">Toggle Timer In Worker</button>
+
+<p id="output"></p>
+
+<script type="text/javascript">
+    var worker;
+
+    function startWorker() {
+        if (!window.Worker) {
+            alert('Worker is not supported!');
+            return;
+        }
+        if (!worker) {
+            worker = new Worker('worker-test.js');
+            worker.onmessage = function (e) {
+                var output = document.getElementById('output');
+                //output.innerHTML = e.data + '<hr />' + output.innerHTML;
+
+                var hr = document.createElement("hr");
+                output.insertBefore(hr, output.firstElementChild);
+
+                var span = document.createElement('span');
+                span.innerHTML = e.data;
+                output.insertBefore(span, output.firstElementChild)
+
+                //console.info(e);
+            }
+            worker.onerror = function (e) {
+                alert(e);
+                console.error(e);
+            }
+        }
+    }
+
+    function stopWorker() {
+        if (!worker) {
+            return;
+        }
+        worker.terminate();
+        worker = null;
+    }
+
+    function postMessageToWorker() {
+        if (!worker) {
+            return;
+        }
+        worker.postMessage(new Date());
+    }
+
+    function toggleTimerInWorker() {
+        if (!worker) {
+            return;
+        }
+        worker.postMessage('ToggleTimer');
+    }
+</script>
+</body>
+</html>
